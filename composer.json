@@ -1,4 +1,5 @@
 {
+  "name": "iconify/json-tools",
   "description": "Functions for manipulating Iconify JSON SVG collections.",
   "version": "1.0.0-beta1",
   "type": "library",
