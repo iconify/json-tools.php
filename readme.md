@@ -56,6 +56,8 @@ This function loads collection from JSON file.
 
 Parameters:
 * $file - file to load from
+* $defaultPrefix - default prefix if JSON file does not have one
+* $cacheFile - cache file for parsed JSON collection. This option does not exist in Node.js version of library. Use this to speed up loading
 
 Returns:
 * boolean - true on success, false on failure
@@ -63,6 +65,13 @@ Returns:
 ```
 $collection = new Collection();
 if (!$collection->loadFromFile('json/custom-icons.json')) {
+    throw new \Exception('Failed to load custom-icons.json');
+}
+```
+
+```
+$collection = new Collection();
+if (!$collection->loadFromFile('json/custom-icons.json', null, 'cache/custom-icons.php')) {
     throw new \Exception('Failed to load custom-icons.json');
 }
 ```

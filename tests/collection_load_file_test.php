@@ -70,7 +70,7 @@ final class CollectionLoadFileTest extends TestCase
 
         // Load file from both file and cache. It should be loaded from cache
         $collection4 = new Collection();
-        $collection4->loadFromFile($filename, $cacheFile);
+        $collection4->loadFromFile($filename, null, $cacheFile);
         $this->assertEquals('fa', $collection4->prefix());
         $this->assertNotEquals($items, $collection4->getIcons());
         $this->assertEquals($collection2->getIcons(), $collection4->getIcons());

@@ -144,10 +144,11 @@ class Collection
      * Load collection from file
      *
      * @param string $filename File to load from
+     * @param string|null $defaultPrefix Default prefix if collection does not have one
      * @param string|null $cacheFile File to save cache
      * @return boolean
      */
-    public function loadFromFile($filename, $cacheFile = null)
+    public function loadFromFile($filename, $defaultPrefix = null, $cacheFile = null)
     {
         if ($cacheFile !== null && @file_exists($cacheFile)) {
             // Try to load from cache
@@ -160,10 +161,12 @@ class Collection
         $data = file_get_contents($filename);
 
         // Get default prefix from filename
-        $parts = explode('/', $filename);
-        $parts = explode('\\', array_pop($parts));
-        $parts = explode('.', array_pop($parts));
-        $defaultPrefix = array_shift($parts);
+        if ($defaultPrefix === null) {
+            $parts = explode('/', $filename);
+            $parts = explode('\\', array_pop($parts));
+            $parts = explode('.', array_pop($parts));
+            $defaultPrefix = array_shift($parts);
+        }
 
         if (!$this->loadJSON($data, $defaultPrefix)) {
             return false;
