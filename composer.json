@@ -1,0 +1,22 @@
+{
+  "description": "Functions for manipulating Iconify JSON SVG collections.",
+  "version": "1.0.0-beta1",
+  "type": "library",
+  "license": "MIT",
+  "homepage": "https://iconify.design/",
+  "require": {
+    "php": ">=5.6"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "*",
+    "iconify/json": "*"
+  },
+  "config": {
+    "bin-dir": "bin"
+  },
+  "autoload": {
+    "psr-4": {
+      "Iconify\\JSONTools\\": "lib"
+    }
+  }
+}

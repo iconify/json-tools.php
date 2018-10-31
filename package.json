@@ -1,0 +1,11 @@
+{
+  "scripts": {
+    "test": "bin/phpunit"
+  },
+  "bugs": "https://github.com/iconify-design/json-tools.php/issues",
+  "homepage": "https://github.com/iconify-design/json-tools.php",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/iconify-design/json-tools.php.git"
+  }
+}
