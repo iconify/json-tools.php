@@ -9,7 +9,7 @@ Library is available for PHP and Node.js, code in both versions is almost identi
 To install library run this command:
 
 ```
-composer install iconify/json-tools
+composer require iconify/json-tools
 ```
 
 There are two classes in this package: Collection and SVG
