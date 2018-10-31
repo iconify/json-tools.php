@@ -285,7 +285,7 @@ Parameters:
 
 ```
 $collection = new Collection();
-$collection->loadIconifyCollection('fa-regular');
+$collection->loadIconifyCollection('fa-solid');
 $collection->removeIcon('home');
 ```
 
