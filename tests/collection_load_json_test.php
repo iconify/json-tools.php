@@ -343,12 +343,9 @@ final class CollectionLoadJSONTest extends TestCase
         $this->assertEquals($items['icons']['bar'], [
             'body'  => '<bar />',
             'height'    => 20,
-            'width' => 30
         ]);
         $this->assertEquals($items['icons']['baz'], [
             'body'  => '<baz />',
-            'height'    => 40,
-            'width' => 30
         ]);
     }
 }

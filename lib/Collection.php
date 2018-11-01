@@ -22,7 +22,7 @@ class Collection
     /**
      * @var array
      */
-    protected $_items;
+    public $items;
 
     /**
      * @var array
@@ -36,7 +36,7 @@ class Collection
      */
     public function __construct($prefix = null)
     {
-        $this->_items = is_string($prefix) ? [
+        $this->items = is_string($prefix) ? [
             'prefix'    => $prefix,
             'icons' => []
         ] : null;
@@ -49,7 +49,7 @@ class Collection
      */
     public function prefix()
     {
-        return $this->_items === null ? false : $this->_items['prefix'];
+        return $this->items === null ? false : $this->items['prefix'];
     }
 
     /**
@@ -197,9 +197,6 @@ class Collection
             return false;
         }
 
-        // DeOptimize
-        $this->deOptimize($data);
-
         // Collection does not have prefix - attempt to detect it
         // All icons in collection must have same prefix and its preferred if prefix is set
         if (!isset($data['prefix']) || $data['prefix'] === '') {
@@ -265,7 +262,7 @@ class Collection
         }
 
         // Success
-        $this->_items = $data;
+        $this->items = $data;
         return true;
     }
 
@@ -331,7 +328,7 @@ class Collection
             return false;
         }
 
-        $this->_items = $cached_items;
+        $this->items = $cached_items;
         return true;
     }
 
@@ -343,14 +340,14 @@ class Collection
      */
     public function saveCache($filename, $fileTime)
     {
-        if ($this->_items === null) {
+        if ($this->items === null) {
             return;
         }
         $content = "<?php \nif (class_exists('\\\\Iconify\\\\JSONTools\\\\Collection', false)) { \n
             \$cache_file = " . var_export($filename, true) . ";
             \$cache_time = " . var_export($fileTime, true) . ";
             \$cache_version = " . var_export(self::$_version, true) . ";
-            \$cached_items = " . var_export($this->_items, true) . ";
+            \$cached_items = " . var_export($this->items, true) . ";
         }";
         file_put_contents($filename, $content);
         @chmod($filename, 0644);
@@ -360,32 +357,30 @@ class Collection
      * Get icons data (ready to be saved as JSON)
      *
      * @param null|array $icons List of icons, null if all icons
-     * @param bool $optimize True if result should be optimized
      * @return array|null
      */
-    public function getIcons($icons = null, $optimize = false)
+    public function getIcons($icons = null)
     {
-        if ($this->_items === null) {
+        if ($this->items === null) {
             return null;
         }
 
         if ($icons === null) {
-            $result = $this->_items;
+            $result = $this->items;
         } else {
             $this->_result = [
-                'prefix'    => $this->_items['prefix'],
+                'prefix'    => $this->items['prefix'],
                 'icons' => [],
                 'aliases'   => []
             ];
+            $this->_addDefaultValues($this->_result);
+
             foreach ($icons as $icon) {
                 $this->_copy($icon, 0);
             }
             $result = $this->_result;
         }
 
-        if ($optimize) {
-            Collection::optimize($result);
-        }
         return $result;
     }
 
@@ -401,18 +396,32 @@ class Collection
         if ($iteration > 5 || isset($this->_result['icons'][$name]) || isset($this->_result['aliases'][$name])) {
             return true;
         }
-        if (isset($this->_items['icons'][$name])) {
-            $this->_result['icons'][$name] = $this->_items['icons'][$name];
+        if (isset($this->items['icons'][$name])) {
+            $this->_result['icons'][$name] = $this->items['icons'][$name];
             return true;
         }
-        if (isset($this->_items['aliases']) && isset($this->_items['aliases'][$name])) {
-            if (!$this->_copy($this->_items['aliases'][$name]['parent'], $iteration + 1)) {
+        if (isset($this->items['aliases']) && isset($this->items['aliases'][$name])) {
+            if (!$this->_copy($this->items['aliases'][$name]['parent'], $iteration + 1)) {
                 return false;
             }
-            $this->_result['aliases'][$name] = $this->_items['aliases'][$name];
+            $this->_result['aliases'][$name] = $this->items['aliases'][$name];
             return true;
         }
         return false;
+    }
+
+    /**
+     * Add default values for icon or collection.
+     *
+     * @param $data
+     */
+    protected function _addDefaultValues(&$data)
+    {
+        foreach ($this->items as $key => $value) {
+            if (!isset($data[$key]) && (is_numeric($value) || is_bool($value))) {
+                $data[$key] = $value;
+            }
+        }
     }
 
     /**
@@ -424,31 +433,35 @@ class Collection
      */
     public function getIconData($name)
     {
-        if (isset($this->_items['icons'][$name])) {
-            return self::addMissingAttributes($this->_items['icons'][$name]);
+        if (isset($this->items['icons'][$name])) {
+            $data = $this->items['icons'][$name];
+            $this->_addDefaultValues($data);
+            return self::addMissingAttributes($data);
         }
 
         // Alias
-        if (!isset($this->_items['aliases']) || !isset($this->_items['aliases'][$name])) {
+        if (!isset($this->items['aliases']) || !isset($this->items['aliases'][$name])) {
             return null;
         }
-        $this->_result = $this->_items['aliases'][$name];
+        $this->_result = $this->items['aliases'][$name];
 
-        $parent = $this->_items['aliases'][$name]['parent'];
+        $parent = $this->items['aliases'][$name]['parent'];
         $iteration = 0;
 
         while ($iteration < 5) {
-            if (isset($this->_items['icons'][$parent])) {
+            if (isset($this->items['icons'][$parent])) {
                 // Merge with icon
-                $this->_mergeIcon($this->_items['icons'][$parent]);
+                $icon = $this->items['icons'][$parent];
+                $this->_addDefaultValues($icon);
+                $this->_mergeIcon($icon);
                 return self::addMissingAttributes($this->_result);
             }
 
-            if (!isset($this->_items['aliases'][$parent])) {
+            if (!isset($this->items['aliases'][$parent])) {
                 return null;
             }
-            $this->_mergeIcon($this->_items['aliases'][$parent]);
-            $parent = $this->_items['aliases'][$parent]['parent'];
+            $this->_mergeIcon($this->items['aliases'][$parent]);
+            $parent = $this->items['aliases'][$parent]['parent'];
             $iteration ++;
         }
         return null;
@@ -518,7 +531,7 @@ class Collection
      */
     public function iconExists($name)
     {
-        return $this->_items === null ? false : isset($this->_items['icons'][$name]) || (isset($this->_items['aliases']) && isset($this->_items['aliases'][$name]));
+        return $this->items === null ? false : isset($this->items['icons'][$name]) || (isset($this->items['aliases']) && isset($this->items['aliases'][$name]));
     }
 
     /**
@@ -529,13 +542,13 @@ class Collection
      */
     public function listIcons($includeAliases = false)
     {
-        if ($this->_items === null) {
+        if ($this->items === null) {
             return [];
         }
 
-        $result = array_keys($this->_items['icons']);
-        if ($includeAliases && isset($this->_items['aliases'])) {
-            $result = array_merge($result, array_keys($this->_items['aliases']));
+        $result = array_keys($this->items['icons']);
+        if ($includeAliases && isset($this->items['aliases'])) {
+            $result = array_merge($result, array_keys($this->items['aliases']));
         }
 
         return $result;
@@ -549,23 +562,23 @@ class Collection
      */
     public function removeIcon($icon, $checkAliases = true)
     {
-        if ($this->_items === null) {
+        if ($this->items === null) {
             return;
         }
 
         // Unset icon
-        if (isset($this->_items['icons'][$icon])) {
-            unset($this->_items['icons'][$icon]);
-        } elseif (isset($this->_items['aliases']) && isset($this->_items['aliases'][$icon])) {
-            unset($this->_items['aliases'][$icon]);
+        if (isset($this->items['icons'][$icon])) {
+            unset($this->items['icons'][$icon]);
+        } elseif (isset($this->items['aliases']) && isset($this->items['aliases'][$icon])) {
+            unset($this->items['aliases'][$icon]);
         } else {
             return;
         }
 
         // Check aliases
-        if ($checkAliases && isset($this->_items['aliases'])) {
+        if ($checkAliases && isset($this->items['aliases'])) {
             $list = [];
-            foreach ($this->_items['aliases'] as $key => $data) {
+            foreach ($this->items['aliases'] as $key => $data) {
                 if ($data['parent'] === $icon) {
                     $list[] = $key;
                 }
@@ -609,6 +622,22 @@ class Collection
     }
 
     /**
+     * Set default value for all icons
+     *
+     * @param string $key
+     * @param int|float|bool $value
+     */
+    public function setDefaultIconValue($key, $value)
+    {
+        if ($this->items === null) {
+            return;
+        }
+        if (is_numeric($value) || is_bool($value)) {
+            $this->items[$key] = $value;
+        }
+    }
+
+    /**
      * Add item
      *
      * @param $name
@@ -618,16 +647,16 @@ class Collection
      */
     protected function _add($name, $data, $alias)
     {
-        if ($this->_items === null) {
+        if ($this->items === null) {
             return false;
         }
 
-        if ($alias && !isset($this->_items['aliases'])) {
-            $this->_items['aliases'] = [];
+        if ($alias && !isset($this->items['aliases'])) {
+            $this->items['aliases'] = [];
         }
-        $this->_items[$alias ? 'aliases' : 'icons'][$name] = $data;
-        if (!$alias && isset($this->_items['aliases'])) {
-            unset ($this->_items['aliases'][$name]);
+        $this->items[$alias ? 'aliases' : 'icons'][$name] = $data;
+        if (!$alias && isset($this->items['aliases'])) {
+            unset ($this->items['aliases'][$name]);
         }
 
         return true;
@@ -641,7 +670,7 @@ class Collection
      */
     public function scriptify($options = null)
     {
-        if ($this->_items === null) {
+        if ($this->items === null) {
             return '';
         }
 
@@ -667,7 +696,10 @@ class Collection
         }
 
         // Get JSON data
-        $json = $this->getIcons($options['icons'], $options['optimize']);
+        $json = $this->getIcons($options['icons']);
+        if ($options['optimize']) {
+            self::optimize($json);
+        }
         $json = json_encode($json, $options['pretty'] ? JSON_PRETTY_PRINT : 0);
 
         // Wrap in callback

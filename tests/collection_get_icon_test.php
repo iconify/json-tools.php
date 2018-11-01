@@ -8,7 +8,7 @@ final class CollectionGetIconTest extends TestCase
     public function testIcons()
     {
         $collection = new Collection();
-        $this->assertTrue($collection->loadFromFile(__DIR__ . '/fixtures/test1.json'));
+        $this->assertTrue($collection->loadFromFile(__DIR__ . '/fixtures/test1-optimized.json'));
 
         // Test "fa-arrows"
         $icon = $collection->getIconData('arrows');

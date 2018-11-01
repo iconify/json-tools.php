@@ -183,10 +183,9 @@ This function returns JSON data for selected icons. If used without parameters, 
 
 Parameters:
 * $icons - array of icons
-* $optimize - optional boolean parameter. If true, common values will be moved to root of array, making JSON data smaller. Set to true when using script during development to make JSON files smaller, set to false to avoid unnecessary overhead if using script at run time
 
 ```
-$data = collection->getIcons(['arrow-left', 'arrow-right', 'home'], true);
+$data = collection->getIcons(['arrow-left', 'arrow-right', 'home']);
 file_put_contents('bundle.json', json_encode($data));
 ```
 
@@ -197,6 +196,8 @@ $data = collection->getIcons();
 $newCollection = new Collection();
 $newCollection->loadJSON($data);
 ```
+
+Using $collection->getIcons() without parameters is same as accessing $collection->items array.
 
 #### scriptify()
 
@@ -275,6 +276,18 @@ $collection->addAlias('arrow-right', 'arrow-left', [
 $collection->addAlias('arrow-right-alias', 'arrow-right');
 ```
 
+### setDefaultIconValue()
+
+Set default value for all icons.
+
+Parameters:
+* $key - attribute name
+* $value - default value
+
+```
+$collection->setDefaultIconValue('verticalAlign', -0.143);
+```
+
 ### removeIcon()
 
 Removes icon or alias from collection.
@@ -322,6 +335,13 @@ echo 'Available icons in vaadin collection: ', implode(', ', $collection->listIc
 ```
 
 ### Other functions
+
+#### items
+
+This is a property, not function. You can use it to have access to raw JSON data. Value is same as using getIcons()
+without parameters, however editing result of getIcons() will not affect collection data because it copies array.
+
+Editing $collection->items array will change collection data.
 
 #### prefix()
 

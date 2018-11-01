@@ -10,13 +10,17 @@ final class CollectionOptimizeTest extends TestCase
     {
         // Get data from test1.json
         $original = file_get_contents(__DIR__ . '/fixtures/test1.json');
+        $preOptimized = file_get_contents(__DIR__ . '/fixtures/test1-optimized.json');
+
         $original = json_decode($original, true);
+        $preOptimized = json_decode($preOptimized, true);
 
         // Optimize it
         $optimized = $original;
         Collection::optimize($optimized);
 
         $this->assertNotEquals($original, $optimized);
+        $this->assertEquals($preOptimized, $optimized);
 
         // Test verticalAlign
         $this->assertEquals(-0.143, $optimized['verticalAlign']);
