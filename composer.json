@@ -1,7 +1,7 @@
 {
   "name": "iconify/json-tools",
   "description": "Functions for manipulating Iconify JSON SVG collections.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "library",
   "license": "MIT",
   "homepage": "https://iconify.design/",
