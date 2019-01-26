@@ -20,6 +20,13 @@ class SVG
     protected $_item;
 
     /**
+     * Attributes used for icon
+     *
+     * @var array
+     */
+    protected static $_iconAttributes = ['width', 'height', 'inline', 'hFlip', 'vFlip', 'flip', 'rotate', 'align', 'color', 'box'];
+
+    /**
      * Constructor
      *
      * @param array $icon Icon data
@@ -31,12 +38,12 @@ class SVG
     }
 
     /**
-     * Generate SVG
+     * Get SVG attributes
      *
      * @param array $props Custom properties (same as query string in Iconify API)
-     * @return string
+     * @return array
      */
-    public function getSVG($props = [])
+    public function getAttributes($props = [])
     {
         $item = $this->_item;
 
@@ -51,7 +58,7 @@ class SVG
             'hFlip' => $item['hFlip'],
             'vFlip' => $item['vFlip']
         ];
-        $style = '';
+        $style = [];
 
         $attributes = [];
 
@@ -197,7 +204,7 @@ class SVG
 
         // Add vertical-align for inline icon
         if ($inline && $item['verticalAlign'] !== 0) {
-            $style .= 'vertical-align: ' . $item['verticalAlign'] . 'em;';
+            $style['vertical-align'] = $item['verticalAlign'] . 'em';
         }
 
         // Check custom alignment
@@ -227,12 +234,6 @@ class SVG
             }
         }
 
-        // Add 360deg transformation to style to prevent subpixel rendering bug
-        $style .= '-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);';
-
-        // Style attribute
-        $attributes['style'] = $style;
-
         // Generate viewBox and preserveAspectRatio attributes
         $attributes['preserveAspectRatio'] = $this->_align($align);
         $attributes['viewBox'] = $box['left'] . ' ' . $box['top'] . ' ' . $box['width'] . ' ' . $box['height'];
@@ -251,11 +252,50 @@ class SVG
             $body .= '<rect x="' . $box['left'] . '" y="' . $box['top'] . '" width="' . $box['width'] . '" height="' . $box['height'] . '" fill="rgba(0, 0, 0, 0)" />';
         }
 
+        return [
+            'attributes' => $attributes,
+            'body' => $body,
+            'style' => $style
+        ];
+    }
+
+    /**
+     * Generate SVG
+     *
+     * @param array $props Custom properties (same as query string in Iconify API)
+     * @param bool $addExtra True if extra attributes should be added to SVG.
+     * @return string
+     */
+    public function getSVG($props = [], $addExtra = false)
+    {
+        $attributes = self::splitAttributes($props);
+        $data = $this->getAttributes($attributes['icon']);
+
         $svg = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"';
-        foreach ($attributes as $attr => $value) {
+
+        // Add extra attributes
+        if ($addExtra) {
+            foreach ($attributes['node'] as $attr => $value) {
+                $svg .= ' ' . htmlspecialchars($attr) . '="' . htmlspecialchars($value) . '"';
+            }
+        }
+
+        // Add SVG attributes
+        foreach ($data['attributes'] as $attr => $value) {
             $svg .= ' ' . $attr . '="' . $value . '"';
         }
-        $svg .= '>' . $body . '</svg>';
+
+        // Add style with 360deg transformation to style to prevent subpixel rendering bug
+        $svg .= ' style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);';
+        foreach ($data['style'] as $attr => $value) {
+            $svg .= ' ' . $attr . ': ' . $value . ';';
+        }
+        if (!empty($props) && isset($props['style'])) {
+            $svg .= $props['style'];
+        }
+        $svg .= '">';
+
+        $svg .= $data['body'] . '</svg>';
 
         return $svg;
     }
@@ -293,6 +333,20 @@ class SVG
                 $result .= 'YMid';
         }
         $result .= $align['slice'] === true ? ' slice' : ' meet';
+        return $result;
+    }
+
+    public static function splitAttributes($props)
+    {
+        $result = [
+            'icon' => [],
+            'node' => []
+        ];
+
+        foreach ($props as $name => $value) {
+            $result[in_array($name, self::$_iconAttributes) ? 'icon' : 'node'][$name] = $value;
+        }
+
         return $result;
     }
 
