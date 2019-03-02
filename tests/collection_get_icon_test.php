@@ -33,8 +33,7 @@ final class CollectionGetIconTest extends TestCase
         $this->assertNull($icon);
 
         // Test alias
-        $icon = $collection->getIconData('arrow-circle-right');
-        $this->assertEquals([
+        $expected = [
             // data from alias
             'hFlip' => true,
             'parent'    => 'arrow-circle-left',
@@ -50,7 +49,14 @@ final class CollectionGetIconTest extends TestCase
             'rotate'    => 0,
             'left'  => 0,
             'top'   => 0
-        ], $icon);
+        ];
+
+        $icon = $collection->getIconData('arrow-circle-right');
+        $this->assertEquals($expected, $icon);
+
+        // Test character
+        $icon = $collection->getIconData('f0a9');
+        $this->assertEquals($expected, $icon);
     }
 }
 

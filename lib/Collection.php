@@ -258,6 +258,20 @@ class Collection
                 }
                 $data[$prop] = $newItems;
             }
+
+            // Remove prefix from characters
+            if (isset($data['chars'])) {
+                foreach ($data['chars'] as $char => $item) {
+                    $test = substr($item, 0, $sliceLength);
+
+                    if ($test !== $test1 && $test !== $test2) {
+                        return false;
+                    }
+
+                    $data['chars'][$char] = substr($item, $sliceLength);
+                }
+            }
+
             $data['prefix'] = $prefix;
         }
 
@@ -396,10 +410,14 @@ class Collection
         if ($iteration > 5 || isset($this->_result['icons'][$name]) || isset($this->_result['aliases'][$name])) {
             return true;
         }
+
+        // Icon
         if (isset($this->items['icons'][$name])) {
             $this->_result['icons'][$name] = $this->items['icons'][$name];
             return true;
         }
+
+        // Alias
         if (isset($this->items['aliases']) && isset($this->items['aliases'][$name])) {
             if (!$this->_copy($this->items['aliases'][$name]['parent'], $iteration + 1)) {
                 return false;
@@ -407,6 +425,19 @@ class Collection
             $this->_result['aliases'][$name] = $this->items['aliases'][$name];
             return true;
         }
+
+        // Character - return as alias
+        if (isset($this->items['chars']) && isset($this->items['chars'][$name])) {
+            if (!$this->_copy($this->items['chars'][$name], $iteration + 1)) {
+                return false;
+            }
+            $this->_result['aliases'][$name] = [
+                'parent' => $this->items['chars'][$name]
+            ];
+            return true;
+        }
+
+        // Not found
         return false;
     }
 
@@ -429,18 +460,23 @@ class Collection
      * This function assumes collection has been loaded. Verification should be done during loading
      *
      * @param string $name
+     * @param bool $normalized False if optional data can be skipped (true by default)
      * @return array|null
      */
-    public function getIconData($name)
+    public function getIconData($name, $normalized = true)
     {
         if (isset($this->items['icons'][$name])) {
             $data = $this->items['icons'][$name];
             $this->_addDefaultValues($data);
-            return self::addMissingAttributes($data);
+            return $normalized ? self::addMissingAttributes($data) : $data;
         }
 
         // Alias
         if (!isset($this->items['aliases']) || !isset($this->items['aliases'][$name])) {
+            // Character
+            if (isset($this->items['chars']) && isset($this->items['chars'][$name])) {
+                return $this->getIconData($this->items['chars'][$name], $normalized);
+            }
             return null;
         }
         $this->_result = $this->items['aliases'][$name];
@@ -454,7 +490,7 @@ class Collection
                 $icon = $this->items['icons'][$parent];
                 $this->_addDefaultValues($icon);
                 $this->_mergeIcon($icon);
-                return self::addMissingAttributes($this->_result);
+                return $normalized ? self::addMissingAttributes($this->_result) : $this->_result;
             }
 
             if (!isset($this->items['aliases'][$parent])) {
@@ -649,6 +685,14 @@ class Collection
     {
         if ($this->items === null) {
             return false;
+        }
+
+        if (isset($data['char'])) {
+            if (!isset($this->items['chars'])) {
+                $this->items['chars'] = [];
+            }
+            $this->items['chars'][$data['char']] = $name;
+            unset($data['char']);
         }
 
         if ($alias && !isset($this->items['aliases'])) {

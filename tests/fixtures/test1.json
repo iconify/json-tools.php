@@ -111,5 +111,14 @@
       "parent": "arrow-left",
       "hFlip": true
     }
+  },
+  "chars": {
+    "f1fa": "at",
+    "f069": "asterisk",
+    "f060": "arrow-left",
+    "f061": "arrow-right",
+    "f062": "arrow-up",
+    "f063": "arrow-down",
+    "f0a9": "arrow-circle-right"
   }
 }

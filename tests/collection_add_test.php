@@ -27,7 +27,8 @@ final class CollectionAddTest extends TestCase
             'body'  => '<bar />'
         ]));
         $this->assertTrue($collection->addIcon('baz', [
-            'body'  => '<baz />'
+            'body'  => '<baz />',
+            'char'  => 'f0a0'
         ]));
 
         // Add aliases
@@ -35,10 +36,12 @@ final class CollectionAddTest extends TestCase
             'rotate'    => 1
         ]));
         $this->assertTrue($collection->addAlias('bar3', 'bar2', [
-            'hFlip' => true
+            'hFlip' => true,
+            'char'  => 'f0a1'
         ]));
         $this->assertFalse($collection->addAlias('foo2', 'foo1', [
-            'hFlip'    => true
+            'hFlip'    => true,
+            'char'  => 'f0a2'
         ]));
 
         // Test reserved word (JavaScript bug, fixed in 1.0.5)
@@ -73,6 +76,10 @@ final class CollectionAddTest extends TestCase
                     'parent'    => 'foo',
                     'vFlip' => true
                 ]
+            ],
+            'chars' => [
+                'f0a0'  => 'baz',
+                'f0a1'  => 'bar3'
             ]
         ], $collection->getIcons());
 
