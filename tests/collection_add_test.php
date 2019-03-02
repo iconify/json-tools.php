@@ -41,6 +41,11 @@ final class CollectionAddTest extends TestCase
             'hFlip'    => true
         ]));
 
+        // Test reserved word (JavaScript bug, fixed in 1.0.5)
+        $this->assertTrue($collection->addAlias('constructor', 'foo', [
+            'vFlip' => true
+        ]));
+
         // Get JSON data
         $this->assertEquals([
             'prefix'    => 'test-prefix',
@@ -63,6 +68,10 @@ final class CollectionAddTest extends TestCase
                 'bar3'  => [
                     'parent'    => 'bar2',
                     'hFlip' => true
+                ],
+                'constructor'   => [
+                    'parent'    => 'foo',
+                    'vFlip' => true
                 ]
             ]
         ], $collection->getIcons());
