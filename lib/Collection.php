@@ -722,9 +722,8 @@ class Collection
             // Array of icons to get
             'icons' => null,
 
-            // JavaScript callback function. Default callback uses SimpleSVG instead of Iconify for backwards compatibility
-            // with Iconify 1.0.0-beta6 (that used to be called SimpleSVG) and older versions.
-            'callback'  => 'SimpleSVG.addCollection',
+            // JavaScript callback function.
+            'callback'  => 'Iconify.addCollection',
 
             // True if result should be optimized for smaller file size
             'optimize'  => false,
