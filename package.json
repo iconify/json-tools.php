@@ -6,6 +6,6 @@
   "homepage": "https://github.com/iconify/json-tools.php",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/iconify/json-tools.php.git"
+    "url": "git://github.com/iconify/json-tools.php.git"
   }
 }
