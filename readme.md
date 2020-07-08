@@ -187,7 +187,7 @@ Returns:
 - array - icon data
 
 ```php
-$data = collection->getIconData('arrow-left');
+$data = $collection->getIconData('arrow-left');
 $svg = new SVG($data);
 echo $svg->getSVG();
 ```
@@ -201,14 +201,14 @@ Parameters:
 - `$icons` - icon names array.
 
 ```php
-$data = collection->getIcons(['arrow-left', 'arrow-right', 'home']);
+$data = $collection->getIcons(['arrow-left', 'arrow-right', 'home']);
 file_put_contents('bundle.json', json_encode($data));
 ```
 
 This function can also be used to copy collection:
 
 ```php
-$data = collection->getIcons();
+$data = $collection->getIcons();
 $newCollection = new Collection();
 $newCollection->loadJSON($data);
 ```
@@ -241,11 +241,11 @@ $collection = new Collection();
 if (!$collection->loadIconifyCollection('mdi')) {
     throw new \Exception('Cannot load Material Design Icons');
 }
-$code = $collection->scriptify({
+$code = $collection->scriptify([
     'icons' => ['account', 'account-alert', 'home', 'book-open'],
     'pretty' => false,
     'optimize' => true
-});
+]);
 file_put_contents('bundle-mdi.js', $code);
 ```
 
@@ -398,7 +398,7 @@ Returns:
 - string - location of the file.
 
 ```php
-echo 'fa-solid.json can be found at ', $collection->findIconifyCollection('fa-solid'), "\n";
+echo 'fa-solid.json can be found at ', Collection::findIconifyCollection('fa-solid'), "\n";
 ```
 
 #### optimize()
@@ -466,10 +466,10 @@ echo $svg->getSVG();
 - `flip` - alternative to "hFlip" and "vFlip", string. Value can be "horizontal", "vertical" or "horizontal,vertical"
 - `rotate` - rotation. Value can be in degrees "90deg" (only 90, 180 and 270 rotations are available), percentages "25%" (25%, 50% and 75% are aliases of 90deg, 180deg and 270deg) or number 1-3 (1 - 90deg, 2 - 180deg, 3 - 270deg).
 - `align` - alignment. This is useful if you have custom width and height set. Unlike other images, SVG keep aspect ratio (unless stated otherwise) when scaled. Value is comma or space separated string with possible strings (example: "left,top,crop"):
-  ** `left`, `right`, `center` - horizontal alignment
-  ** `top`, `middle`, `bottom` - vertical alignment
-  ** `crop` - crop parts that go outside of boundaries
-  ** `meet` - scale icon down to fit entire icon (opposite of crop)
+  - `left`, `right`, `center` - horizontal alignment
+  - `top`, `middle`, `bottom` - vertical alignment
+  - `crop` - crop parts that go outside of boundaries
+  - `meet` - scale icon down to fit entire icon (opposite of crop)
 - `color` - custom color string to replace currentColor. This is useful when using icon as background image because background image cannot use currentColor
 - `box` - if true or "true" or "1" (string or boolean), icon will include extra rectangle matching its view box. This is useful to export icon to editor making icon easier to scale or place into its position in sketch because often editors ignore viewBox.
 
@@ -485,7 +485,7 @@ $svg->getSVG([
     'rotate' => '90deg', // same as "'rotate' =>  1" or "'rotate' => '25%'"
     'flip' => 'horizontal', // same as "'hFlip' => true"
     'box' => true
-});
+]);
 $svg->getSVG([
     'height' => 'auto' // height and width will be set from viewBox attribute, using original icon's dimensions
 ]);
