@@ -1,6 +1,7 @@
 bin
 .idea
 .DS_Store
+.phpunit.*
 composer.phar
 composer.lock
 tests/cache/*.php

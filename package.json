@@ -1,11 +1,12 @@
 {
-  "scripts": {
-    "test": "bin/phpunit"
-  },
-  "bugs": "https://github.com/iconify/json-tools.php/issues",
-  "homepage": "https://github.com/iconify/json-tools.php",
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/iconify/json-tools.php.git"
-  }
+	"scripts": {
+		"test": "bin/phpunit tests/*Test.php --bootstrap=vendor/autoload.php",
+		"test:svg": "bin/phpunit tests/SVGTest.php --bootstrap=vendor/autoload.php"
+	},
+	"bugs": "https://github.com/iconify/json-tools.php/issues",
+	"homepage": "https://github.com/iconify/json-tools.php",
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/iconify/json-tools.php.git"
+	}
 }

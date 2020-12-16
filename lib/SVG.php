@@ -285,17 +285,19 @@ class SVG
             $svg .= ' ' . $attr . '="' . $value . '"';
         }
 
-        // Add style with 360deg transformation to style to prevent subpixel rendering bug
-        $svg .= ' style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);';
+        // Add style
+        $style = '';
         foreach ($data['style'] as $attr => $value) {
-            $svg .= ' ' . $attr . ': ' . $value . ';';
+            $style .= ' ' . $attr . ': ' . $value . ';';
         }
         if (!empty($props) && isset($props['style'])) {
-            $svg .= $props['style'];
+            $style .= $props['style'];
         }
-        $svg .= '">';
+        if ($style !== '') {
+            $svg .= ' style="' . trim($style) . '"';
+        }
 
-        $svg .= $data['body'] . '</svg>';
+        $svg .= '>' . $data['body'] . '</svg>';
 
         return $svg;
     }

@@ -2,7 +2,7 @@
 
 use \Iconify\JSONTools\SVG;
 
-class DimensionsTest extends \PHPUnit\Framework\TestCase {
+final class DimensionsTest extends \PHPUnit\Framework\TestCase {
     public function testNumbers()
     {
         $width = 48;
